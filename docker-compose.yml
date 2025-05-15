@@ -1,3 +1,6 @@
+include:
+  - ./supabase/docker/docker-compose.yml
+
 volumes:
   n8n_storage:
   ollama_storage:
@@ -76,6 +79,8 @@ services:
   #     - PORT=3001
   #   ports:
   #     - 3001:3001
+  #     - FLOWISE_USERNAME=${FLOWISE_USERNAME}
+  #     - FLOWISE_PASSWORD=${FLOWISE_PASSWORD} 
   #   extra_hosts:
   #     - "host.docker.internal:host-gateway"        
   #   volumes:
