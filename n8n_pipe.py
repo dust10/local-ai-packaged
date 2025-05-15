@@ -12,6 +12,8 @@ from pydantic import BaseModel, Field
 import os
 import time
 import requests
+import random
+
 
 def extract_event_info(event_emitter) -> tuple[Optional[str], Optional[str]]:
     if not event_emitter or not event_emitter.__closure__:
@@ -23,10 +25,11 @@ def extract_event_info(event_emitter) -> tuple[Optional[str], Optional[str]]:
             return chat_id, message_id
     return None, None
 
+
 class Pipe:
     class Valves(BaseModel):
         n8n_url: str = Field(
-            default="https://n8n.[your domain].com/webhook/[your webhook URL]"
+            default="https://n8n.dbostian.dev/webhook/invoke_n8n_agent"
         )
         n8n_bearer_token: str = Field(default="...")
         input_field: str = Field(default="chatInput")
@@ -81,9 +84,21 @@ class Pipe:
         __event_emitter__: Callable[[dict], Awaitable[None]] = None,
         __event_call__: Callable[[dict], Awaitable[dict]] = None,
     ) -> Optional[dict]:
-        await self.emit_status(
-            __event_emitter__, "info", "/Calling N8N Workflow...", False
-        )
+        status_options = [
+            "Reviewing personnel scrolls...",
+            "Consulting the HR oracle...",
+            "Fetching wisdom from the workflow wizards...",
+            "Querying the Ministry of Paperwork...",
+            "Polling the People Ops Prophets...",
+            "Summoning contract spirits...",
+            "Cross-checking with Compliance Central...",
+            "Mining employee records for golden insights...",
+            "Knocking on n8n’s door with an HR hat on...",
+            "Verifying with the Vault of Verified Vacations...",
+        ]
+
+        status_message = random.choice(status_options)
+        await self.emit_status(__event_emitter__, "info", status_message, False)
         chat_id, _ = extract_event_info(__event_emitter__)
         messages = body.get("messages", [])
 
