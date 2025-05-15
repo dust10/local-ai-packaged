@@ -5,3 +5,4 @@ shared/
 supabase/
 searxng/uwsgi.ini
 searxng/settings.yml
+open-webui/
