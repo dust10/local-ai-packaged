@@ -53,6 +53,21 @@ x-init-ollama: &init-ollama
     # Change the name of the LLM and num_ctx as you see fit.
 
 services:
+  streamlit:
+    build: ./streamlit
+    container_name: streamlit
+    restart: unless-stopped
+    environment:
+      - STREAMLIT_REDIRECT_URI=${STREAMLIT_REDIRECT_URI:-http://localhost:8501/oauth2callback}
+      - STREAMLIT_CLIENT_ID=${STREAMLIT_CLIENT_ID:-streamlit}
+      - STREAMLIT_CLIENT_SECRET=${STREAMLIT_CLIENT_SECRET:-some_long_secret}
+      - STREAMLIT_COOKIE_SECRET=${STREAMLIT_COOKIE_SECRET:-some_long_secret}
+      - STREAMLIT_SERVER_METADATA_URL=${STREAMLIT_SERVER_METADATA_URL:-https://login.microsoftonline.com/consumers/v2.0/.well-known/openid-configuration}
+      - N8N_CHAT_WEBHOOK_URL=${N8N_CHAT_WEBHOOK_URL:-http://localhost:5678/webhook/n8n-chat}
+      - N8N_CHAT_BEARER_TOKEN=${N8N_CHAT_BEARER_TOKEN}
+    ports:
+      - 8501:8501
+
   # flowise:
   #   image: flowiseai/flowise
   #   restart: unless-stopped
@@ -130,6 +145,7 @@ services:
       - SUPABASE_HOSTNAME=${SUPABASE_HOSTNAME:-":8005"}
       - SEARXNG_HOSTNAME=${SEARXNG_HOSTNAME:-":8006"}
       - LANGFUSE_HOSTNAME=${LANGFUSE_HOSTNAME:-":8007"}
+      - STREAMLIT_HOSTNAME=${STREAMLIT_HOSTNAME:-":8008"}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL:-internal}
     ports:
       - 80:80

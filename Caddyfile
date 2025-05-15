@@ -27,6 +27,11 @@
     reverse_proxy webui:8080
 }
 
+# Streamlit
+{$STREAMLIT_HOSTNAME} {
+    reverse_proxy streamlit:8501
+}
+
 # Flowise
 {$FLOWISE_HOSTNAME} {
     reverse_proxy localhost:3001
