@@ -7,12 +7,24 @@
 {$N8N_HOSTNAME} {
     # For domains, Caddy will automatically use Let's Encrypt
     # For localhost/port addresses, HTTPS won't be enabled
-    reverse_proxy localhost:5678
+    reverse_proxy n8n:5678
+
+    @webhookTestPath path /webhook-test/*
+    @options method OPTIONS
+
+    header @webhookTestPath {
+        Access-Control-Allow-Origin "https://openwebui.dbostian.dev"
+        Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+        Access-Control-Allow-Credentials true
+    }
+
+    respond @options 204
 }
 
 # Open WebUI
 {$WEBUI_HOSTNAME} {
-    reverse_proxy localhost:3000
+    reverse_proxy webui:8080
 }
 
 # Flowise

@@ -1,5 +1,8 @@
 # see https://docs.searxng.org/admin/settings/settings.html#settings-use-default-settings
-use_default_settings: true
+use_default_settings:
+  engines:
+    remove:
+      - brave
 server:
   # base_url is defined in the SEARXNG_BASE_URL environment variable, see .env and docker-compose.yml
   secret_key: "ultrasecretkey"  # change this!
@@ -10,6 +13,7 @@ ui:
 redis:
   url: redis://redis:6379/0
 search:
-    formats:
-        - html
-        - json
+  safe_search: 2
+  formats:
+    - html
+    - json
