@@ -24,7 +24,7 @@
 
 # Open WebUI
 {$WEBUI_HOSTNAME} {
-    reverse_proxy webui:8080
+    reverse_proxy open-webui:8080
 }
 
 # Streamlit
@@ -34,22 +34,27 @@
 
 # Flowise
 {$FLOWISE_HOSTNAME} {
-    reverse_proxy localhost:3001
+    reverse_proxy flowise:3001
 }
 
 # Langfuse
 {$LANGFUSE_HOSTNAME} {
-    reverse_proxy localhost:3002
+    reverse_proxy langfuse-web:3000
 }
 
-# Ollama API
-{$OLLAMA_HOSTNAME} {
-    reverse_proxy localhost:11434
-}
+# # Ollama API
+# {$OLLAMA_HOSTNAME} {
+#     reverse_proxy ollama:11434
+# }
 
 # Supabase
 {$SUPABASE_HOSTNAME} {
-    reverse_proxy localhost:8000
+    reverse_proxy kong:8000
+}
+
+# Neo4j
+{$NEO4J_HOSTNAME} {
+    reverse_proxy neo4j:7474
 }
 
 # SearXNG
@@ -103,7 +108,7 @@
     }
     
     # SearXNG (uWSGI)
-    reverse_proxy localhost:8080 {
+    reverse_proxy searxng:8080 {
         header_up X-Forwarded-Port {http.request.port}
         header_up X-Real-IP {http.request.remote.host}
         # https://github.com/searx/searx-docker/issues/24
