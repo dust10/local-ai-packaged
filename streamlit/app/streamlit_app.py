@@ -8,18 +8,28 @@ import logging
 import sys
 import json
 
-PARAM_EMBEDDED = "embedded"
+st.set_page_config(
+    page_title="iShift HR Assistant",
+    page_icon=":robot:",
+    layout="centered"
+)
 
-logger = logging.getLogger("streamlit_app")
-if not logger.hasHandlers():
-    # Create a new handler if no handlers are present
-    handler = logging.StreamHandler(sys.stdout)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    logger.setLevel(logging.DEBUG)
+@st.cache_resource
+def configure_logging():
+    # Configure logging
+    logging.basicConfig(
+        level=logging._nameToLevel.get(os.getenv("STREAMLIT_LOGGER_LEVEL", "ERROR").upper(), logging.ERROR),
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
+    return logging.getLogger(__name__)
+
+logger = configure_logging()
 
 def login_screen():
+    st.title("iShift HR Assistant")
     st.header("This app is private.")
     st.subheader("Please log in.")
     st.button("Log in with Microsoft", on_click=st.login)
@@ -38,26 +48,25 @@ def response_generator(response):
         time.sleep(0.05)
 
 def chat_screen():
-    if not st.session_state.embedded:
-        st.title("iShift HR Assistant")
+    st.title("iShift HR Assistant")
 
-        st.markdown(
-            """
-            <style>
-                div[data-testid="stColumn"]:nth-of-type(2)
-                {
-                    text-align: end;
-                } 
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            st.subheader(f"Welcome, {st.user.name}!")
-        with col2:
-            st.button("Log out", on_click=st.logout, key="logout_button")
+    st.markdown(
+        """
+        <style>
+            div[data-testid="stColumn"]:nth-of-type(2)
+            {
+                text-align: end;
+            } 
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader(f"Welcome, {st.user.name}!")
+    with col2:
+        st.button("Log out", on_click=st.logout, key="logout_button")
     
     if "chat_id" not in st.session_state:
         st.session_state["chat_id"] = generate_chat_id()
@@ -77,7 +86,7 @@ def chat_screen():
         with st.chat_message("assistant"):
             # Invoke N8N workflow
             headers = {
-                "Authorization": f"Bearer {os.getenv('N8N_CHAT_BEARER_TOKEN')}",
+                "x-api-key": os.getenv('N8N_CHAT_BEARER_TOKEN'),
                 "Content-Type": "application/json",
             }
             payload = {
@@ -91,29 +100,13 @@ def chat_screen():
                 )
                 logger.debug(f"N8N response: {n8n_response.status_code} - {n8n_response.text}")
                 if n8n_response.status_code == 200:
-                    resp_txt = n8n_response.json()["output"].replace("$", "\$")
+                    resp_txt = n8n_response.json()["text"].replace("$", "\$")
                 else:
                     resp_txt = f"Error: {n8n_response.status_code} - {n8n_response.text}"
                 status.update(label="Complete", state="complete", expanded=False)
 
             response = st.write_stream(response_generator(resp_txt))
         st.session_state.messages.append({"role": "assistant", "content": response})
-
-logger.debug(f"Query params: {st.query_params}")
-
-if "embedded" not in st.session_state:
-    if PARAM_EMBEDDED in st.query_params:
-        logger.debug(f"Embed parameter found: {st.query_params[PARAM_EMBEDDED]}")
-        st.session_state.embedded = st.query_params[PARAM_EMBEDDED].lower() == "true"
-    else:
-        logger.debug("Embed parameter not found, defaulting to False")
-        st.session_state.embedded = False
-
-st.set_page_config(
-    page_title="iShift HR Assistant",
-    page_icon=":robot:",
-    layout= "wide" if st.session_state.embedded else "centered"
-)
 
 if not st.user.is_logged_in:
     login_screen()
