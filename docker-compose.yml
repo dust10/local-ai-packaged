@@ -108,7 +108,7 @@ services:
       - "-c"
       - "n8n import:credentials --separate --input=/backup/credentials && n8n import:workflow --separate --input=/backup/workflows"
     volumes:
-      - ./n8n/backup:/backup  
+      - ./n8n/backup:/backup
 
   n8n:
     <<: *service-n8n
@@ -192,7 +192,7 @@ services:
   #   restart: always
   #   depends_on: &langfuse-depends-on
   #     postgres:
-  #       condition: service_healthy    
+  #       condition: service_healthy
   #     minio:
   #       condition: service_healthy
   #     redis:
@@ -349,7 +349,7 @@ services:
       test: ["CMD", "redis-cli", "ping"]
       interval: 3s
       timeout: 10s
-      retries: 10        
+      retries: 10
 
   searxng:
     container_name: searxng

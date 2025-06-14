@@ -86,7 +86,7 @@ def chat_screen():
         with st.chat_message("assistant"):
             # Invoke N8N workflow
             headers = {
-                "x-api-key": os.getenv('N8N_CHAT_BEARER_TOKEN'),
+                "Authorization": f"Bearer {os.getenv('N8N_CHAT_BEARER_TOKEN')}",
                 "Content-Type": "application/json",
             }
             payload = {
@@ -100,7 +100,7 @@ def chat_screen():
                 )
                 logger.debug(f"N8N response: {n8n_response.status_code} - {n8n_response.text}")
                 if n8n_response.status_code == 200:
-                    resp_txt = n8n_response.json()["text"].replace("$", "\$")
+                    resp_txt = n8n_response.json()["output"].replace("$", "\$")
                 else:
                     resp_txt = f"Error: {n8n_response.status_code} - {n8n_response.text}"
                 status.update(label="Complete", state="complete", expanded=False)
